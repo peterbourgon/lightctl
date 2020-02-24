@@ -32,18 +32,19 @@ func run(args []string, stdin io.Reader, stdout, stderr io.Writer) error {
 		rootfs     = flag.NewFlagSet("lightctl", flag.ExitOnError)
 		gateway    = rootfs.String("gateway", "udp://10.0.1.11:5684", "TRÅDFRI gateway address")
 		gatewayURL url.URL
-
-		auth   = command.Auth(&gatewayURL, stdout, stderr)
-		device = command.Device(&gatewayURL, stdout, stderr)
-		group  = command.Group(&gatewayURL, stdout, stderr)
 	)
 
 	root := &ffcli.Command{
-		ShortUsage:  "lightctl <subcommand> ...",
-		Subcommands: []*ffcli.Command{auth, device, group},
-		FlagSet:     rootfs,
-		Options:     options,
-		Exec:        func(ctx context.Context, args []string) error { return flag.ErrHelp },
+		ShortUsage: "lightctl <subcommand> ...",
+		Subcommands: []*ffcli.Command{
+			command.Sun(stdout, stderr),
+			command.Auth(&gatewayURL, stdout, stderr),
+			command.Device(&gatewayURL, stdout, stderr),
+			command.Group(&gatewayURL, stdout, stderr),
+		},
+		FlagSet: rootfs,
+		Options: options,
+		Exec:    func(ctx context.Context, args []string) error { return flag.ErrHelp },
 	}
 
 	if err := root.Parse(args[1:]); err != nil {

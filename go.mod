@@ -7,4 +7,5 @@ require (
 	github.com/peterbourgon/ff v1.7.0
 	github.com/peterbourgon/ff/v2 v2.0.0
 	github.com/pion/dtls/v2 v2.0.0-rc.5
+	github.com/sixdouglas/suncalc v0.0.0-20190521105718-f30ff7e4f358
 )

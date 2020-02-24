@@ -115,7 +115,7 @@ func GroupSetLight(gateway *url.URL, stdout, stderr io.Writer) *ffcli.Command {
 		Subcommands: []*ffcli.Command{
 			GroupSetLightState(gateway, stdout, stderr),
 			GroupSetLightLevel(gateway, stdout, stderr),
-			GroupSetLightRed(gateway, stdout, stderr),
+			GroupSetLightWhite(gateway, stdout, stderr),
 		},
 		Exec: func(ctx context.Context, args []string) error { return flag.ErrHelp },
 	}
@@ -186,11 +186,11 @@ func GroupSetLightLevel(gateway *url.URL, stdout, stderr io.Writer) *ffcli.Comma
 	}
 }
 
-func GroupSetLightRed(gateway *url.URL, stdout, stderr io.Writer) *ffcli.Command {
-	fs := flag.NewFlagSet("lightctl group set light red", flag.ExitOnError)
+func GroupSetLightWhite(gateway *url.URL, stdout, stderr io.Writer) *ffcli.Command {
+	fs := flag.NewFlagSet("lightctl group set light white", flag.ExitOnError)
 	var (
 		id         = fs.Int("id", 0, "group ID")
-		red        = fs.Int("red", 0, "0..100 (0=white, 100=red)")
+		white      = fs.Int("white", 0, "0..100 (0=red, 100=white)")
 		transition = fs.Duration("transition", 0, "transition time")
 	)
 
@@ -210,14 +210,16 @@ func GroupSetLightRed(gateway *url.URL, stdout, stderr io.Writer) *ffcli.Command
 				return fmt.Errorf("error dialing gateway: %w", err)
 			}
 
-			if *red < 0 {
-				*red = 0
+			if *white < 0 {
+				*white = 0
 			}
-			if *red > 100 {
-				*red = 100
+			if *white > 100 {
+				*white = 100
 			}
 
-			mireds := 250 + int((float64(*red)/100)*(454-250))
+			red := 100 - *white
+			mireds := 250 + int((float64(red)/100)*(454-250))
+
 			return client.SetLightControlMireds(coap.RootGroups, *id, mireds, *transition)
 		},
 	}
